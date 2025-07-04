@@ -24,7 +24,7 @@ public class AuthController {
 		return ResponseEntity.ok("회원가입 성공!");
 	}
 
-	@PostMapping("/login")
+	@PostMapping("/login") 
 	public ResponseEntity<LoginResponse> login(@RequestBody UserDto userDto) {
 		LoginResponse tokens = userService.login(userDto.getUsername(), userDto.getPassword());
 		return ResponseEntity.ok(tokens);
