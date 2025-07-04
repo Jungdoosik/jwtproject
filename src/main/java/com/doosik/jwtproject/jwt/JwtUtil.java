@@ -39,6 +39,15 @@ public class JwtUtil {
                 .compact();
 	}
 	
+	public String generateRefreshToken(String username) {
+	    long expirationTime = 1000L * 60 * 60 * 24 * 7; // 7일
+	    return Jwts.builder()
+	            .setSubject(username)
+	            .setIssuedAt(new Date())
+	            .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+	            .signWith(key, SignatureAlgorithm.HS512)
+	            .compact();
+	}
 	// 토큰에서 사용자 이름 가져오기
     public String getUsername(String token) {
         return extractAllClaims(token).getSubject();
@@ -57,8 +66,22 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(key)
                 .parseClaimsJws(token)
                 .getBody();
     }
+    
+    // 필터에서 쓸 간단 버전 (유효성만)
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                .setSigningKey(key) // key는 이미 init()에서 준비된 SecretKey
+                .build()
+                .parseClaimsJws(token);
+            return true; // 파싱 성공
+        } catch (Exception e) {
+            return false; // 서명 틀림, 만료됨 등
+        }
+    }
+    
 }

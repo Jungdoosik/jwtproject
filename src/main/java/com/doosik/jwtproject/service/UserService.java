@@ -1,13 +1,17 @@
 package com.doosik.jwtproject.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.doosik.jwtproject.domain.RefreshToken;
 import com.doosik.jwtproject.domain.User;
+import com.doosik.jwtproject.dto.LoginResponse;
 import com.doosik.jwtproject.dto.UserDto;
 import com.doosik.jwtproject.jwt.JwtUtil;
+import com.doosik.jwtproject.repository.RefreshTokenRepository;
 import com.doosik.jwtproject.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final RefreshTokenRepository refreshTokenRepository;
 	private final JwtUtil jwtUtil;
 	
 	public void register(UserDto dto) {
@@ -33,8 +38,8 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	// ✅ 로그인 → JWT 발급
-    public String login(String username, String password) {
+	//  로그인 → JWT 발급
+    public LoginResponse login(String username, String password) {
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isEmpty()) {
@@ -46,7 +51,24 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
+        
+        //  Access + Refresh Token 발급
+        String accessToken = jwtUtil.generateToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
-        return jwtUtil.generateToken(user.getUsername());
+     //  Refresh Token DB에 저장 (이미 만들어뒀다고 가정)
+        refreshTokenRepository.findByUsername(username)	
+            .ifPresent(refreshTokenRepository::delete);
+
+        RefreshToken rt = RefreshToken.builder()
+            .username(username)
+            .token(refreshToken)
+            .expiryDate(LocalDateTime.now().plusDays(7))
+            .build();
+
+        refreshTokenRepository.save(rt);
+
+        // ✅ 두 개를 DTO로 묶어 리턴!
+        return new LoginResponse(accessToken, refreshToken);
     }
 }
