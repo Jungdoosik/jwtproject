@@ -3,9 +3,8 @@ package com.doosik.jwtproject.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
+@Getter 
 @AllArgsConstructor
-public class LoginResponse {
-	private String accessToken;
-    private String refreshToken;
+public class TokenResponseDto {
+	 private String accessToken;
 }

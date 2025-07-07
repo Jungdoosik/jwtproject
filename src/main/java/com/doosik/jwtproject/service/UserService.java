@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.doosik.jwtproject.domain.RefreshToken;
 import com.doosik.jwtproject.domain.User;
-import com.doosik.jwtproject.dto.LoginResponse;
+import com.doosik.jwtproject.dto.LoginResponseDto;
 import com.doosik.jwtproject.dto.UserDto;
 import com.doosik.jwtproject.jwt.JwtUtil;
 import com.doosik.jwtproject.repository.RefreshTokenRepository;
@@ -39,7 +39,7 @@ public class UserService {
 	}
 	
 	//  로그인 → JWT 발급
-    public LoginResponse login(String username, String password) {
+    public LoginResponseDto login(String username, String password) {
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isEmpty()) {
@@ -69,6 +69,6 @@ public class UserService {
         refreshTokenRepository.save(rt);
 
         // ✅ 두 개를 DTO로 묶어 리턴!
-        return new LoginResponse(accessToken, refreshToken);
+        return new LoginResponseDto(accessToken, refreshToken);
     }
 }

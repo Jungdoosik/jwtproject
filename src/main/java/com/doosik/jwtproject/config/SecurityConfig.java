@@ -35,6 +35,8 @@ public class SecurityConfig {
                     "/h2-console/**",
                     "/api/auth/**"
                 ).permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN") // 관리자만
+                .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // 사용자 + 관리자
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 🔑 JWT 필터 추가
