@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.doosik.jwtproject.domain.RefreshToken;
 import com.doosik.jwtproject.dto.LoginResponseDto;
+import com.doosik.jwtproject.dto.LogoutRequestDto;
 import com.doosik.jwtproject.dto.RefreshRequestDto;
 import com.doosik.jwtproject.dto.TokenResponseDto;
 import com.doosik.jwtproject.dto.UserDto;
@@ -54,5 +55,18 @@ public class AuthController {
 		String newAccessToken = jwtUtil.generateToken(savedToken.getUsername());
 
 		return ResponseEntity.ok(new TokenResponseDto(newAccessToken));
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<String> logout(@RequestBody LogoutRequestDto request) {
+		String refreshToken = request.getRefreshToken(); 
+		
+		RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+	        .orElseThrow(() -> new RuntimeException("유효하지 않은 RefreshToken"));
+
+	    // 삭제
+	    refreshTokenRepository.delete(token);
+		
+		return ResponseEntity.ok("로그아웃. RefreshToken 삭제.");
 	}
 }
