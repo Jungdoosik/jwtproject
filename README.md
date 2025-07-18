@@ -35,7 +35,7 @@ Access Token + Refresh Token + 권한 관리 + Swagger 연동 + 테스트 코드
 ## ⚙️ JWT 흐름 설명
 
 1️⃣ **회원가입**
-- `/api/auth/register`  
+- `/api/auth/signup`  
 - 사용자 정보를 DB에 저장  
 - 비밀번호는 BCrypt로 안전하게 암호화
 
@@ -50,7 +50,7 @@ Access Token + Refresh Token + 권한 관리 + Swagger 연동 + 테스트 코드
 - `JwtAuthenticationFilter`가 요청마다 JWT를 검증 → `SecurityContext`에 사용자 정보 등록
 
 4️⃣ **내 정보 조회**
-- `/api/user/me`
+- `/api/user/myInfo`
 - JWT 인증이 성공하면 현재 로그인한 사용자 정보 반환
 
 5️⃣ **Access Token 갱신**
