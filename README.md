@@ -79,7 +79,7 @@ Access Token + Refresh Token + 권한 관리 + Swagger 연동 + 테스트 코드
 
 ```bash
 # 1. clone
-git clone https://github.com/yourname/your-jwt-project.git
+git clone https://github.com/Jungdoosik/jwtproject.git
 
 # 2. build
 ./gradlew build
