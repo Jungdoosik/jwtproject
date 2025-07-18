@@ -18,7 +18,8 @@ import org.springframework.test.web.servlet.MockMvc; // MockMvc: HTTP 요청 시
 
 import com.doosik.jwtproject.domain.User; // 유저 엔티티
 import com.doosik.jwtproject.dto.LoginResponseDto;
-import com.doosik.jwtproject.dto.UserDto;
+import com.doosik.jwtproject.dto.RefreshRequestDto;
+import com.doosik.jwtproject.repository.RefreshTokenRepository;
 import com.doosik.jwtproject.repository.UserRepository; // 유저 저장소
 import com.fasterxml.jackson.databind.ObjectMapper; // JSON 직렬화 도구
 
@@ -37,6 +38,13 @@ class AuthControllerTest {
 
     @Autowired
     PasswordEncoder passwordEncoder; // 비밀번호 암호화
+    
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
+    
+    private String accessToken; // 👉 테스트용 AccessToken 저장
+    
+    private String refreshToken;
 
     @BeforeEach // 각 테스트 실행 전에 실행됨
     void setUp() {
@@ -56,7 +64,7 @@ class AuthControllerTest {
     @DisplayName("로그인 성공 시 Access + Refresh Token 발급") // 테스트 이름
     void loginSuccess() throws Exception {
         // given: 로그인 요청 DTO 준비
-    	UserDto request = new UserDto();
+    	User request = new User();
         request.setUsername("testuser");
         request.setPassword("1234");
 
@@ -80,4 +88,105 @@ class AuthControllerTest {
         assertThat(response.getAccessToken()).isNotBlank();
         assertThat(response.getRefreshToken()).isNotBlank();
     }
+    
+//    @BeforeEach
+//    void setUp() throws Exception {
+//        userRepository.deleteAll(); // 👉 DB 초기화
+//
+//        // 👉 테스트용 사용자 저장
+//        User user = User.builder()
+//                .username("testuser")
+//                .password(passwordEncoder.encode("1234"))
+//                .role("ROLE_USER")
+//                .build();
+//
+//        userRepository.save(user);
+//
+//        // 👉 로그인 요청해서 JWT AccessToken 미리 받아두기
+//        User request = new User();
+//        request.setUsername("testuser");
+//        request.setPassword("1234");
+//
+//        String result = mockMvc.perform(
+//                        post("/api/auth/login") // 👉 POST /api/auth/login 요청
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(objectMapper.writeValueAsString(request))
+//                )
+//                .andExpect(status().isOk()) // 👉 200 OK 기대
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString(); // 👉 JSON 응답 문자열로 받기
+//
+//        // 👉 응답 JSON → Map으로 파싱해서 accessToken 꺼내기
+//        accessToken = objectMapper.readTree(result).get("accessToken").asText();
+//    }
+//    
+//    @Test
+//    @DisplayName("JWT 인증 시 현재 사용자 정보 반환")
+//    void getMyInfo() throws Exception {
+//        //  when: GET /api/user/me 요청 (Authorization 헤더에 Bearer 붙임)
+//        mockMvc.perform(
+//                        get("/api/user/me") // GET 요청
+//                                .header("Authorization", "Bearer " + accessToken) // 👉 JWT 인증
+//                                .accept(MediaType.APPLICATION_JSON) // 👉 JSON 응답 기대
+//                )
+//                .andExpect(status().isOk()) // 200 OK 기대
+//                .andExpect(jsonPath("$.username").value("testuser")) // 👉 username 값 검증
+//                .andExpect(jsonPath("$.role").value("ROLE_USER")); // 👉 role 값 검증
+//    }
+    
+//    @BeforeEach
+//    void setUp() throws Exception {
+//        userRepository.deleteAll();
+//        refreshTokenRepository.deleteAll(); // 👉 RefreshToken 저장소도 깨끗하게
+//
+//        // 👉 테스트 사용자 저장
+//        User user = User.builder()
+//                .username("testuser")
+//                .password(passwordEncoder.encode("1234"))
+//                .role("ROLE_USER")
+//                .build();
+//        userRepository.save(user);
+//
+//        // 👉 로그인 요청으로 RefreshToken 발급받기
+//        User request = new User();
+//        request.setUsername("testuser");
+//        request.setPassword("1234");
+//
+//        String result = mockMvc.perform(
+//                        post("/api/auth/login")
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(objectMapper.writeValueAsString(request))
+//                )
+//                .andExpect(status().isOk())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        refreshToken = objectMapper.readTree(result).get("refreshToken").asText();
+//
+//        // 👉 DB에 RefreshToken 존재 확인 (실제 저장됨)
+//        boolean exists = refreshTokenRepository.findByToken(refreshToken).isPresent();
+//        assertThat(exists).isTrue();
+//    }
+//
+//    @Test
+//    @DisplayName("로그아웃 성공 시 Refresh Token 삭제")
+//    void logoutSuccess() throws Exception {
+//        // 👉 로그아웃 요청 바디 준비
+//    	RefreshRequestDto logoutRequest = new RefreshRequestDto();
+//        logoutRequest.setRefreshToken(refreshToken);
+//
+//        // 👉 POST /api/auth/logout 요청
+//        mockMvc.perform(
+//                        post("/api/auth/logout")
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(objectMapper.writeValueAsString(logoutRequest))
+//                )
+//                .andExpect(status().isOk());
+//
+//        // 👉 DB에 RefreshToken이 삭제됐는지 확인
+//        boolean existsAfterLogout = refreshTokenRepository.findByToken(refreshToken).isPresent();
+//        assertThat(existsAfterLogout).isFalse();
+//    }
 }
