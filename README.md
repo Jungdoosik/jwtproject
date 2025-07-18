@@ -26,10 +26,11 @@ Access Token + Refresh Token + 권한 관리 + Swagger 연동 + 테스트 코드
 - Spring Security
 - JWT (io.jsonwebtoken.JJJWT)
 - H2 Database (테스트용)
-- JPA/Hibernate
+- JPA/Hibernate 
 - Swagger (SpringDoc OpenAPI)
 - JUnit5 + MockMvc
 
+- jpa는 인터페이스, Hibernate는 엔진이라 결론적으로 동작시키는건 Hibernate
 ---
 
 ## ⚙️ JWT 흐름 설명
