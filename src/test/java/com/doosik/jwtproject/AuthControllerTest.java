@@ -124,9 +124,9 @@ class AuthControllerTest {
 //    @Test
 //    @DisplayName("JWT 인증 시 현재 사용자 정보 반환")
 //    void getMyInfo() throws Exception {
-//        //  when: GET /api/user/me 요청 (Authorization 헤더에 Bearer 붙임)
+//        //  when: GET /api/user/myInfo 요청 (Authorization 헤더에 Bearer 붙임)
 //        mockMvc.perform(
-//                        get("/api/user/me") // GET 요청
+//                        get("/api/user/myInfo") // GET 요청
 //                                .header("Authorization", "Bearer " + accessToken) // 👉 JWT 인증
 //                                .accept(MediaType.APPLICATION_JSON) // 👉 JSON 응답 기대
 //                )
